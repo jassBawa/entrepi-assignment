@@ -1,49 +1,100 @@
+"use client"
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useEffect, useState } from "react"
+import { Trophy } from "lucide-react"
 
 interface LeaderboardUser {
   id: number
   name: string
   xp: number
-  streak: number
-  avatar?: string
+  streak: {
+    currentCount: number
+  }
 }
 
-const dummyUsers: LeaderboardUser[] = [
-  { id: 1, name: "Alex Johnson", xp: 2500, streak: 7, avatar: "https://i.pravatar.cc/150?img=1" },
-  { id: 2, name: "Sarah Williams", xp: 2100, streak: 5, avatar: "https://i.pravatar.cc/150?img=2" },
-  { id: 3, name: "Michael Brown", xp: 1900, streak: 3, avatar: "https://i.pravatar.cc/150?img=3" },
-  { id: 4, name: "Emily Davis", xp: 1700, streak: 4, avatar: "https://i.pravatar.cc/150?img=4" },
-  { id: 5, name: "David Wilson", xp: 1500, streak: 2, avatar: "https://i.pravatar.cc/150?img=5" },
-]
-
 export function Leaderboard() {
+  const [users, setUsers] = useState<LeaderboardUser[]>([])
+  const [type, setType] = useState<"xp" | "streak">("xp")
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchLeaderboard = async () => {
+      try {
+        const response = await fetch(`/api/leaderboard?type=${type}`)
+        const data = await response.json()
+        setUsers(data)
+      } catch (error) {
+        console.error("Error fetching leaderboard:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchLeaderboard()
+  }, [type])
+
   return (
-    <Card className="w-full">
+    <Card>
       <CardHeader>
-        <CardTitle>Top Learners</CardTitle>
+        <CardTitle>Leaderboard</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
-          {dummyUsers.map((user, index) => (
-            <div key={user.id} className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="font-bold text-lg">{index + 1}</div>
-                <Avatar>
-                  <AvatarImage src={user.avatar} />
-                  <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-                </Avatar>
-                <div>
-                  <div className="font-medium">{user.name}</div>
-                  <div className="text-sm text-muted-foreground">
-                    Streak: {user.streak} days
+        <Tabs defaultValue="xp" onValueChange={(value) => setType(value as "xp" | "streak")}>
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="xp">Top XP</TabsTrigger>
+            <TabsTrigger value="streak">Top Streaks</TabsTrigger>
+          </TabsList>
+          <TabsContent value="xp" className="mt-4">
+            <div className="space-y-4">
+              {loading ? (
+                <div className="text-center">Loading...</div>
+              ) : (
+                users.map((user, index) => (
+                  <div
+                    key={user.id}
+                    className="flex items-center justify-between p-2 rounded-lg bg-muted"
+                  >
+                    <div className="flex items-center space-x-2">
+                      {index === 0 && <Trophy className="h-5 w-5 text-yellow-500" />}
+                      {index === 1 && <Trophy className="h-5 w-5 text-gray-400" />}
+                      {index === 2 && <Trophy className="h-5 w-5 text-amber-600" />}
+                      <span className="font-medium">{user.name}</span>
+                    </div>
+                    <span className="text-sm text-muted-foreground">
+                      {user.xp} XP
+                    </span>
                   </div>
-                </div>
-              </div>
-              <div className="font-bold">{user.xp} XP</div>
+                ))
+              )}
             </div>
-          ))}
-        </div>
+          </TabsContent>
+          <TabsContent value="streak" className="mt-4">
+            <div className="space-y-4">
+              {loading ? (
+                <div className="text-center">Loading...</div>
+              ) : (
+                users.map((user, index) => (
+                  <div
+                    key={user.id}
+                    className="flex items-center justify-between p-2 rounded-lg bg-muted"
+                  >
+                    <div className="flex items-center space-x-2">
+                      {index === 0 && <Trophy className="h-5 w-5 text-yellow-500" />}
+                      {index === 1 && <Trophy className="h-5 w-5 text-gray-400" />}
+                      {index === 2 && <Trophy className="h-5 w-5 text-amber-600" />}
+                      <span className="font-medium">{user.name}</span>
+                    </div>
+                    <span className="text-sm text-muted-foreground">
+                      {user.streak.currentCount} days
+                    </span>
+                  </div>
+                ))
+              )}
+            </div>
+          </TabsContent>
+        </Tabs>
       </CardContent>
     </Card>
   )

@@ -16,6 +16,7 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchStreak = async () => {
       try {
+        setLoading(true);
         const response = await fetch("/api/streak");
         if (!response.ok) {
           throw new Error("Failed to fetch streak data");
@@ -26,35 +27,13 @@ export default function Dashboard() {
       } catch (error) {
         console.error("Error fetching streak data:", error);
         setError("Failed to load streak data");
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchStreak();
   }, []);
-
-  // Function to mark today's activity
-  const handleCompleteToday = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await fetch("/api/streak", {
-        method: "POST",
-      });
-      
-      if (!response.ok) {
-        throw new Error("Failed to update streak");
-      }
-      
-      const data = await response.json();
-      setCurrentStreak(data.currentCount);
-      setLastActiveOn(new Date());
-    } catch (error) {
-      console.error("Error updating streak:", error);
-      setError("Failed to update streak");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   if (error) {
     return (
@@ -66,20 +45,23 @@ export default function Dashboard() {
 
   return (
     <div className="container mx-auto py-8">
-      <h1 className="text-3xl font-bold mb-8">Dashboard</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-6">
-          <StreakComponent 
-            currentStreak={currentStreak} 
-            lastActiveOn={lastActiveOn}
-            onCompleteToday={handleCompleteToday}
-            loading={loading}
-          />
-          <SkillMapping />
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold">Dashboard</h1>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          <Leaderboard />
+          <div className="space-y-6">
+            <StreakComponent 
+              currentStreak={currentStreak} 
+              lastActiveOn={lastActiveOn}
+              loading={loading}
+            />
+            <SkillMapping />
+          </div>
         </div>
         <div className="space-y-6">
-          <Leaderboard />
-          <ReflectiveQuestions />
+          {/* <ReflectiveQuestions /> */}
         </div>
       </div>
     </div>

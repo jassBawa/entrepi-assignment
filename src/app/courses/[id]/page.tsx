@@ -13,7 +13,7 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import Link from 'next/link';
-
+import { useRouter } from 'next/navigation';
 interface Lesson {
   id: number;
   title: string;
@@ -59,6 +59,7 @@ export default function CourseDetailPage({
   params: { id: string };
 }) {
   const courseId = parseInt(params.id);
+  const router = useRouter();
   const progress = 50; // This would come from the database
   const completedLessons = dummyLessons.filter(
     (lesson) => lesson.completed
@@ -107,7 +108,7 @@ export default function CourseDetailPage({
                         Duration: {lesson.duration}
                       </div>
                     </div>
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" onClick={() => router.push(`/courses/${courseId}/lessons/${lesson.id}`)}>
                       {lesson.completed ? 'Review' : 'Start'}
                     </Button>
                   </div>

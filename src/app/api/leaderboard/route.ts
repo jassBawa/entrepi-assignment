@@ -1,26 +1,58 @@
 // pages/api/leaderboard/index.js
 
-import { prisma } from '@/lib/prisma';
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextResponse } from "next/server"
+import prisma from "@/lib/prisma"
 
+export async function GET(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const type = searchParams.get("type") || "xp" // "xp" or "streak"
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method === "GET") {
-    try {
-      // Retrieve all users, sorted by xp descending.
-      const users = await prisma.user.findMany({
+    let users
+    if (type === "xp") {
+      users = await prisma.user.findMany({
         orderBy: {
-          xp: 'desc'
+          xp: "desc"
         },
-        select: { id: true, name: true, xp: true } // Returning only essential data
-      });
-      return res.status(200).json(users);
-    } catch (error) {
-      console.error("Error fetching leaderboard:", error);
-      return res.status(500).json({ error: "Unable to fetch leaderboard data." });
+        take: 10,
+        select: {
+          id: true,
+          name: true,
+          xp: true,
+          streak: {
+            select: {
+              currentCount: true
+            }
+          }
+        }
+      })
+    } else {
+      users = await prisma.user.findMany({
+        orderBy: {
+          streak: {
+            currentCount: "desc"
+          }
+        },
+        take: 10,
+        select: {
+          id: true,
+          name: true,
+          xp: true,
+          streak: {
+            select: {
+              currentCount: true
+            }
+          }
+        }
+      })
     }
-  }
 
-  res.setHeader('Allow', ['GET']);
-  return res.status(405).end(`Method ${req.method} Not Allowed`);
+    return NextResponse.json(users)
+  } catch (error) {
+    console.error("Error fetching leaderboard:", error)
+    return NextResponse.json(
+      { error: "Failed to fetch leaderboard" },
+      { status: 500 }
+    )
+  }
 }
