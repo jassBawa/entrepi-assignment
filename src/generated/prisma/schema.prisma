@@ -1,0 +1,59 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite" // or "postgresql"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id          Int          @id @default(autoincrement())
+  name        String
+  email       String       @unique
+  xp          Int          @default(0)
+  streak      Streak?
+  reflections Reflection[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Streak {
+  id           Int      @id @default(autoincrement())
+  userId       Int      @unique
+  user         User     @relation(fields: [userId], references: [id])
+  currentCount Int      @default(0)
+  lastActiveOn DateTime
+}
+
+model Lesson {
+  id          Int                  @id @default(autoincrement())
+  title       String
+  content     String
+  reflections ReflectiveQuestion[]
+}
+
+model ReflectiveQuestion {
+  id          Int          @id @default(autoincrement())
+  lessonId    Int
+  question    String
+  lesson      Lesson       @relation(fields: [lessonId], references: [id])
+  reflections Reflection[]
+}
+
+// answers to questions
+model Reflection {
+  id         Int                @id @default(autoincrement())
+  userId     Int
+  questionId Int
+  answer     String
+  user       User               @relation(fields: [userId], references: [id])
+  question   ReflectiveQuestion @relation(fields: [questionId], references: [id])
+}

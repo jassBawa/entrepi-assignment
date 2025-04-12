@@ -1,5 +1,5 @@
 // pages/api/reflective/index.js
-import { prisma } from '@/lib/prisma';
+import prisma  from '@/lib/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 const DUMMY_USER_ID = 1;

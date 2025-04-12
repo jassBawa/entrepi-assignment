@@ -6,56 +6,54 @@
 
 generator client {
   provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
 }
 
-
-
-// prisma/schema.prisma
-
 datasource db {
-   provider = "sqlite"
+  provider = "sqlite" // or "postgresql"
   url      = "file:./dev.db"
 }
 
-
 model User {
-  id                  Int                  @id @default(autoincrement())
-  email               String               @unique
-  name                String?
-  xp                  Int                  @default(0)
-  streak              Streak?              @relation("UserStreak")
-  reflectiveQuestions ReflectiveQuestion[]
-  userSkills          UserSkill[]
+  id          Int          @id @default(autoincrement())
+  name        String
+  email       String       @unique
+  xp          Int          @default(0)
+  streak      Streak?
+  reflections Reflection[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 }
 
 model Streak {
   id           Int      @id @default(autoincrement())
-  currentCount Int      @default(0)
-  lastActive   DateTime
-  user         User     @relation("UserStreak", fields: [userId], references: [id])
   userId       Int      @unique
+  user         User     @relation(fields: [userId], references: [id])
+  currentCount Int      @default(0)
+  lastActiveOn DateTime
+}
+
+model Lesson {
+  id          Int                  @id @default(autoincrement())
+  title       String
+  content     String
+  reflections ReflectiveQuestion[]
 }
 
 model ReflectiveQuestion {
-  id       Int      @id @default(autoincrement())
+  id       Int    @id @default(autoincrement())
+  lessonId Int
   question String
-  answer   String?                 // User’s answer (can be updated later)
-  date     DateTime  @default(now())
-  user     User      @relation(fields: [userId], references: [id])
-  userId   Int
+  lesson      Lesson       @relation(fields: [lessonId], references: [id])
+  reflections Reflection[]
 }
 
-model Skill {
-  id         Int         @id @default(autoincrement())
-  name       String
-  userSkills UserSkill[]
-}
-
-model UserSkill {
-  id      Int    @id @default(autoincrement())
-  xp      Int    @default(0)            // XP earned for this specific skill
-  user    User   @relation(fields: [userId], references: [id])
-  userId  Int
-  skill   Skill  @relation(fields: [skillId], references: [id])
-  skillId Int
+// answers to questions
+model Reflection {
+  id Int @id @default(autoincrement())
+  userId     Int
+  questionId Int
+  answer     String
+  user     User               @relation(fields: [userId], references: [id])
+  question ReflectiveQuestion @relation(fields: [questionId], references: [id])
 }
