@@ -56,45 +56,51 @@ export default async function CoursesPage() {
   const courses = await getCourses()
 
   return (
-    <div className="container mx-auto py-8">
+    <div className="container mx-auto py-8 bg-white dark:bg-black min-h-screen">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Available Courses</h1>
-        <Button asChild>
+        <h1 className="text-3xl font-bold text-black dark:text-white">Available Courses</h1>
+        <Button asChild className="bg-[#5B2A86] hover:bg-[#4A2370] text-white dark:bg-[#FFDE5A] dark:hover:bg-[#E6C851] dark:text-black">
           <Link href="/dashboard">Back to Dashboard</Link>
         </Button>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {courses.map((course) => (
-          <Card key={course.id} className="overflow-hidden">
-            <div className="h-48 bg-gray-200">
+          <Card key={course.id} className="overflow-hidden border-[#E0E0E0] dark:border-[#757575] bg-white dark:bg-[#000000]">
+            <div className="h-48 bg-[#E0E0E0] dark:bg-[#757575]">
               <img
-                src={`https://source.unsplash.com/random/400x300/?${encodeURIComponent(course.title)}`}
+                src={"https://images.unsplash.com/photo-1635070041078-e363dbe005cb"}
                 alt={course.title}
                 className="w-full h-full object-cover"
               />
             </div>
             <CardHeader>
               <div className="flex justify-between items-start">
-                <CardTitle>{course.title}</CardTitle>
-                <span className="text-sm text-muted-foreground bg-muted px-2 py-1 rounded">
+                <CardTitle className="text-black dark:text-white">{course.title}</CardTitle>
+                <span className="text-sm text-[#757575] dark:text-[#E0E0E0] bg-[#E0E0E0] dark:bg-[#757575] px-2 py-1 rounded">
                   {course.title.split(' ')[0]}
                 </span>
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">
+              <p className="text-sm text-[#757575] dark:text-[#E0E0E0] mb-4">
                 {course.description}
               </p>
               <div className="space-y-2">
-                <div className="flex justify-between text-sm">
+                <div className="flex justify-between text-sm text-black dark:text-white">
                   <span>Progress</span>
                   <span>{Math.round(course.progress)}%</span>
                 </div>
-                <Progress value={course.progress} className="h-2" />
-                <div className="text-sm text-muted-foreground">
+                <Progress 
+                  value={course.progress} 
+                  className="h-2 bg-[#E0E0E0] dark:bg-[#757575] [&>div]:bg-[#5B2A86] dark:[&>div]:bg-[#FFDE5A]"
+                />
+                <div className="text-sm text-[#757575] dark:text-[#E0E0E0]">
                   {course.completedLessons} of {course.totalLessons} lessons completed
                 </div>
-                <Button className="w-full mt-4" asChild>
+                <Button 
+                  className="w-full mt-4 bg-[#5B2A86] hover:bg-[#4A2370] text-white dark:bg-[#FFDE5A] dark:hover:bg-[#E6C851] dark:text-black" 
+                  asChild
+                >
                   <Link href={`/courses/${course.id}`}>Continue Learning</Link>
                 </Button>
               </div>

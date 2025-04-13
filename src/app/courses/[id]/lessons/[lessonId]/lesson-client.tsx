@@ -160,24 +160,29 @@ export function LessonClient({
   };
 
   return (
-    <div className="container mx-auto py-8">
+    <div className="container mx-auto py-8 bg-white dark:bg-black min-h-screen">
       <div className="flex items-center gap-4 mb-8">
-        <Button variant="ghost" size="icon" asChild>
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          asChild
+          className="text-black dark:text-white hover:bg-[#FFDE5A] dark:hover:bg-[#5B2A86]"
+        >
           <Link href={`/courses/${courseId}`}>
             <ArrowLeft className="h-4 w-4" />
           </Link>
         </Button>
-        <h1 className="text-3xl font-bold">{lesson.title}</h1>
+        <h1 className="text-3xl font-bold text-black dark:text-white">{lesson.title}</h1>
       </div>
 
       <div className="max-w-3xl mx-auto space-y-6">
         {activeSection === 'content' && (
-          <Card>
+          <Card className="border-[#E0E0E0] dark:border-[#757575] bg-white dark:bg-[#000000]">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle>Lesson Content</CardTitle>
+                <CardTitle className="text-black dark:text-white">Lesson Content</CardTitle>
                 {isContentRead && (
-                  <div className="flex items-center text-green-500">
+                  <div className="flex items-center text-[#5B2A86] dark:text-[#FFDE5A]">
                     <CheckCircle className="h-5 w-5 mr-2" />
                     <span className="text-sm">Completed</span>
                   </div>
@@ -185,9 +190,12 @@ export function LessonClient({
               </div>
             </CardHeader>
             <CardContent>
-              <div className="prose max-w-none">{lesson.content}</div>
+              <div className="prose max-w-none text-black dark:text-white">{lesson.content}</div>
               {!isContentRead && (
-                <Button className="mt-4" onClick={handleContentRead}>
+                <Button 
+                  className="mt-4 bg-[#5B2A86] hover:bg-[#4A2370] text-white dark:bg-[#FFDE5A] dark:hover:bg-[#E6C851] dark:text-black"
+                  onClick={handleContentRead}
+                >
                   Mark as Read
                 </Button>
               )}
@@ -196,12 +204,12 @@ export function LessonClient({
         )}
 
         {activeSection === 'practice' && (
-          <Card>
+          <Card className="border-[#E0E0E0] dark:border-[#757575] bg-white dark:bg-[#000000]">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle>Practice Questions</CardTitle>
+                <CardTitle className="text-black dark:text-white">Practice Questions</CardTitle>
                 {isPracticeComplete && (
-                  <div className="flex items-center text-green-500">
+                  <div className="flex items-center text-[#5B2A86] dark:text-[#FFDE5A]">
                     <CheckCircle className="h-5 w-5 mr-2" />
                     <span className="text-sm">Completed</span>
                   </div>
@@ -212,22 +220,26 @@ export function LessonClient({
               <div className="space-y-6">
                 {lesson.reflections.map((question) => (
                   <div key={question.id} className="space-y-4">
-                    <h3 className="font-medium">{question.question}</h3>
+                    <h3 className="font-medium text-black dark:text-white">{question.question}</h3>
                     <div className="space-y-2">
                       {['Option 1', 'Option 2', 'Option 3', 'Option 4'].map((option, index) => (
                         <div
                           key={index}
-                          className={`flex items-center space-x-2 p-3 border rounded-md cursor-pointer hover:bg-muted ${
-                            selectedOptions[question.id] === index ? 'bg-muted' : ''
+                          className={`flex items-center space-x-2 p-3 border rounded-md cursor-pointer hover:bg-[#FFDE5A] dark:hover:bg-[#5B2A86] ${
+                            selectedOptions[question.id] === index 
+                              ? 'bg-[#FFDE5A] dark:bg-[#5B2A86] text-black dark:text-white' 
+                              : 'border-[#E0E0E0] dark:border-[#757575]'
                           }`}
                           onClick={() => handleOptionSelect(question.id, index)}
                         >
                           <div
                             className={`h-4 w-4 rounded-full border-2 ${
-                              selectedOptions[question.id] === index ? 'border-primary' : ''
+                              selectedOptions[question.id] === index 
+                                ? 'border-[#5B2A86] dark:border-[#FFDE5A]' 
+                                : 'border-[#757575]'
                             }`}
                           />
-                          <span>{option}</span>
+                          <span className="text-black dark:text-white">{option}</span>
                         </div>
                       ))}
                     </div>
@@ -237,6 +249,7 @@ export function LessonClient({
                   <Button
                     variant="outline"
                     onClick={() => setActiveSection('content')}
+                    className="border-[#5B2A86] text-[#5B2A86] hover:bg-[#FFDE5A] dark:border-[#FFDE5A] dark:text-[#FFDE5A] dark:hover:bg-[#5B2A86]"
                   >
                     Back to Content
                   </Button>
@@ -245,6 +258,7 @@ export function LessonClient({
                     disabled={!lesson.reflections.every(
                       (question) => selectedOptions[question.id] !== undefined
                     )}
+                    className="bg-[#5B2A86] hover:bg-[#4A2370] text-white dark:bg-[#FFDE5A] dark:hover:bg-[#E6C851] dark:text-black disabled:opacity-50"
                   >
                     Submit Practice
                   </Button>
@@ -255,15 +269,15 @@ export function LessonClient({
         )}
 
         {activeSection === 'reflection' && (
-          <Card>
+          <Card className="border-[#E0E0E0] dark:border-[#757575] bg-white dark:bg-[#000000]">
             <CardHeader>
-              <CardTitle>Reflective Questions</CardTitle>
+              <CardTitle className="text-black dark:text-white">Reflective Questions</CardTitle>
             </CardHeader>
             <CardContent>
               {showSuccess && (
-                <Alert className="mb-4">
-                  <CheckCircle2 className="h-4 w-4" />
-                  <AlertDescription>
+                <Alert className="mb-4 bg-[#FFDE5A] dark:bg-[#5B2A86] border-[#5B2A86] dark:border-[#FFDE5A]">
+                  <CheckCircle2 className="h-4 w-4 text-[#5B2A86] dark:text-[#FFDE5A]" />
+                  <AlertDescription className="text-black dark:text-white">
                     Your reflections have been saved successfully!
                   </AlertDescription>
                 </Alert>
@@ -271,15 +285,15 @@ export function LessonClient({
               <div className="space-y-6">
                 {lesson.reflections.map((question) => (
                   <div key={question.id} className="space-y-4">
-                    <h3 className="font-medium">{question.question}</h3>
+                    <h3 className="font-medium text-black dark:text-white">{question.question}</h3>
                     {answers[question.id] ? (
-                      <div className="p-4 bg-muted rounded-md">
-                        <p className="text-sm">{answers[question.id]}</p>
+                      <div className="p-4 bg-[#E0E0E0] dark:bg-[#757575] rounded-md">
+                        <p className="text-sm text-black dark:text-white">{answers[question.id]}</p>
                       </div>
                     ) : (
                       <Textarea
                         placeholder="Type your answer here..."
-                        className="min-h-[100px]"
+                        className="min-h-[100px] border-[#E0E0E0] dark:border-[#757575] bg-white dark:bg-[#000000] text-black dark:text-white"
                         value={tempAnswers[question.id] || ''}
                         onChange={(e) =>
                           setTempAnswers((prev) => ({
@@ -295,6 +309,7 @@ export function LessonClient({
                   <Button
                     variant="outline"
                     onClick={() => setActiveSection('practice')}
+                    className="border-[#5B2A86] text-[#5B2A86] hover:bg-[#FFDE5A] dark:border-[#FFDE5A] dark:text-[#FFDE5A] dark:hover:bg-[#5B2A86]"
                   >
                     Back to Practice
                   </Button>
@@ -304,6 +319,7 @@ export function LessonClient({
                       disabled={lesson.reflections.some(
                         (question) => !tempAnswers[question.id]
                       )}
+                      className="bg-[#5B2A86] hover:bg-[#4A2370] text-white dark:bg-[#FFDE5A] dark:hover:bg-[#E6C851] dark:text-black disabled:opacity-50"
                     >
                       Submit Reflections
                     </Button>
@@ -314,20 +330,23 @@ export function LessonClient({
           </Card>
         )}
 
-        <Card>
+        <Card className="border-[#E0E0E0] dark:border-[#757575] bg-white dark:bg-[#000000]">
           <CardHeader>
-            <CardTitle>Lesson Progress</CardTitle>
+            <CardTitle className="text-black dark:text-white">Lesson Progress</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="flex justify-between text-sm">
+              <div className="flex justify-between text-sm text-black dark:text-white">
                 <span>Progress</span>
                 <span>{progress}%</span>
               </div>
-              <Progress value={progress} className="h-2" />
+              <Progress 
+                value={progress} 
+                className="h-2 bg-[#E0E0E0] dark:bg-[#757575] [&>div]:bg-[#5B2A86] dark:[&>div]:bg-[#FFDE5A]"
+              />
               {!isCompleted && (
                 <Button
-                  className="w-full"
+                  className="w-full bg-[#5B2A86] hover:bg-[#4A2370] text-white dark:bg-[#FFDE5A] dark:hover:bg-[#E6C851] dark:text-black"
                   size="lg"
                   onClick={handleCompleteLesson}
                   disabled={!Object.keys(answers).length}
@@ -336,7 +355,11 @@ export function LessonClient({
                 </Button>
               )}
               {isCompleted && (
-                <Button className="w-full" size="lg" asChild>
+                <Button 
+                  className="w-full bg-[#5B2A86] hover:bg-[#4A2370] text-white dark:bg-[#FFDE5A] dark:hover:bg-[#E6C851] dark:text-black"
+                  size="lg" 
+                  asChild
+                >
                   <Link href={`/courses/${courseId}/lessons/${lessonId + 1}`}>
                     Next Lesson
                     <ArrowRight className="ml-2 h-4 w-4" />

@@ -1,36 +1,125 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MicroLearn - Interactive Learning Platform
+
+MicroLearn is a modern, interactive learning platform that helps users build knowledge through hands-on exercises and real-world applications. The platform features a gamified learning experience with streaks, XP, and leaderboards to keep users engaged and motivated.
+
+## Features
+
+- 🎯 Interactive Learning Experience
+- 📊 Progress Tracking
+- 🏆 Gamification (Streaks, XP, Leaderboards)
+- 🌙 Dark/Light Mode
+- 📱 Responsive Design
+- 🔄 Real-time Updates
+- 📝 Reflective Learning
+
+## Tech Stack
+
+- **Frontend**: Next.js 14, React, TypeScript
+- **Styling**: Tailwind CSS, shadcn/ui
+- **Database**: PostgreSQL
+- **ORM**: Prisma
+- **Authentication**: NextAuth.js
+- **Deployment**: Vercel
+
+## Prerequisites
+
+Before you begin, ensure you have the following installed:
+- Node.js (v18 or later)
+- npm or yarn
+- PostgreSQL
+- Git
 
 ## Getting Started
 
-First, run the development server:
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/jassBawa/entrepi-assignment
+   cd entrepi-assignment
+   ```
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+2. **Install dependencies**
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
+
+3. **Set up environment variables**
+   Create a `.env` file in the root directory with the following variables:
+   ```env
+   DATABASE_URL="postgresql://username:password@localhost:5432/microlearn"
+   ```
+
+4. **Set up the database**
+   ```bash
+   npx prisma generate
+   npx prisma db push
+   npx prisma db seed
+   ```
+
+5. **Start the development server**
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
+
+6. **Open [http://localhost:3000](http://localhost:3000)** in your browser to see the application.
+
+## Project Structure
+
+```
+microlearn/
+├── src/
+│   ├── app/              # Next.js app router
+│   ├── components/       # React components
+│   ├── lib/             # Utility functions
+│   ├── styles/          # Global styles
+│   └── types/           # TypeScript types
+├── prisma/              # Database schema and migrations
+├── public/              # Static assets
+└── package.json         # Project dependencies
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Available Scripts
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint
+- `npm run format` - Format code with Prettier
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Database Schema
 
-## Learn More
+The application uses the following main models:
+- User
+- Course
+- Lesson
+- LessonCompletion
+- Streak
+- ReflectiveQuestion
+- Reflection
 
-To learn more about Next.js, take a look at the following resources:
+## Contributing
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## License
 
-## Deploy on Vercel
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Acknowledgments
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [Next.js](https://nextjs.org/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [shadcn/ui](https://ui.shadcn.com/)
+- [Prisma](https://www.prisma.io/)
+- [NextAuth.js](https://next-auth.js.org/)
+
+## Support
+
+For support, email support@microlearn.com or join our Slack channel.

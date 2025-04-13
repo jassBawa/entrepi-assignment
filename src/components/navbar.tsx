@@ -1,10 +1,8 @@
 "use client"
 
-import { useState } from "react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { Button } from "@/components/ui/button"
+import { ModeToggle } from "@/components/mode-toggle"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,10 +11,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { ModeToggle } from "@/components/mode-toggle"
-import { FlameIcon as Fire, Menu } from "lucide-react"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Badge } from "@/components/ui/badge"
+import { Menu, User, Settings, LogOut, Trophy } from "lucide-react"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { useState } from "react"
 
 export default function Navbar() {
   const pathname = usePathname()
@@ -30,8 +29,8 @@ export default function Navbar() {
   ]
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="px-4 flex h-16 items-center justify-between">
+    <header className="sticky top-0 z-50 w-full border-b border-[#E0E0E0] dark:border-[#757575] bg-white/80 dark:bg-black/80 backdrop-blur-sm">
+      <div className="container mx-auto px-4 flex h-16 items-center justify-between">
         <div className="flex items-center gap-2 md:gap-6">
           <Sheet>
             <SheetTrigger asChild>
@@ -40,9 +39,9 @@ export default function Navbar() {
                 <span className="sr-only">Toggle menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="pr-0">
+            <SheetContent side="left" className="pr-0 bg-white dark:bg-black">
               <div className="px-7">
-                <Link href="/" className="flex items-center gap-2 font-bold text-lg">
+                <Link href="/" className="flex items-center gap-2 font-bold text-lg text-black dark:text-white">
                   MicroLearn
                 </Link>
               </div>
@@ -52,7 +51,9 @@ export default function Navbar() {
                     key={item.href}
                     href={item.href}
                     className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm ${
-                      pathname === item.href ? "bg-accent font-medium" : "hover:bg-accent"
+                      pathname === item.href 
+                        ? "bg-[#5B2A86] dark:bg-[#FFDE5A] text-white dark:text-black font-medium" 
+                        : "text-black dark:text-white hover:bg-[#E0E0E0] dark:hover:bg-[#757575]"
                     }`}
                   >
                     {item.name}
@@ -61,7 +62,7 @@ export default function Navbar() {
               </nav>
             </SheetContent>
           </Sheet>
-          <Link href="/" className="flex items-center gap-2 font-bold text-lg">
+          <Link href="/" className="flex items-center gap-2 font-bold text-lg text-black dark:text-white">
             MicroLearn
           </Link>
           <nav className="hidden md:flex gap-6">
@@ -70,7 +71,9 @@ export default function Navbar() {
                 key={item.href}
                 href={item.href}
                 className={`text-sm font-medium ${
-                  pathname === item.href ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                  pathname === item.href 
+                    ? "text-[#5B2A86] dark:text-[#FFDE5A]" 
+                    : "text-[#757575] dark:text-[#E0E0E0] hover:text-[#5B2A86] dark:hover:text-[#FFDE5A]"
                 }`}
               >
                 {item.name}
@@ -81,42 +84,53 @@ export default function Navbar() {
         <div className="flex items-center gap-2">
           {isLoggedIn ? (
             <>
-              <Badge variant="outline" className="hidden md:flex items-center gap-1 mr-2">
-                <Fire className="h-3 w-3 text-orange-500" />
-                <span>7 day streak</span>
-              </Badge>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="rounded-full">
+                  <Button size="icon" className="rounded-full hover:bg-[#E0E0E0] dark:hover:bg-[#757575]">
                     <Avatar className="h-8 w-8">
                       <AvatarImage src="/placeholder-user.jpg" alt="@user" />
                       <AvatarFallback>AJ</AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link href="/profile">Profile</Link>
+                <DropdownMenuContent align="end" className="w-56 bg-white dark:bg-black border-[#E0E0E0] dark:border-[#757575]">
+                  <DropdownMenuLabel className="text-black dark:text-white">My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator className="bg-[#E0E0E0] dark:bg-[#757575]" />
+                  <DropdownMenuItem asChild className="text-black dark:text-white hover:bg-[#E0E0E0] dark:hover:bg-[#757575]">
+                    <Link href="/profile" className="flex items-center gap-2">
+                      <User className="h-4 w-4" />
+                      Profile
+                    </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/dashboard">Dashboard</Link>
+                  <DropdownMenuItem asChild className="text-black dark:text-white hover:bg-[#E0E0E0] dark:hover:bg-[#757575]">
+                    <Link href="/dashboard" className="flex items-center gap-2">
+                      <Trophy className="h-4 w-4" />
+                      Dashboard
+                    </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/settings">Settings</Link>
+                  <DropdownMenuItem asChild className="text-black dark:text-white hover:bg-[#E0E0E0] dark:hover:bg-[#757575]">
+                    <Link href="/settings" className="flex items-center gap-2">
+                      <Settings className="h-4 w-4" />
+                      Settings
+                    </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => setIsLoggedIn(false)}>Log out</DropdownMenuItem>
+                  <DropdownMenuSeparator className="bg-[#E0E0E0] dark:bg-[#757575]" />
+                  <DropdownMenuItem 
+                    onClick={() => setIsLoggedIn(false)} 
+                    className="text-black dark:text-white hover:bg-[#E0E0E0] dark:hover:bg-[#757575]"
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Log out
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </>
           ) : (
             <>
-              <Button variant="ghost" asChild>
+              <Button variant="ghost" asChild className="text-[#757575] dark:text-[#E0E0E0] hover:text-[#5B2A86] dark:hover:text-[#FFDE5A]">
                 <Link href="/login">Log in</Link>
               </Button>
-              <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
+              <Button asChild className="bg-[#5B2A86] hover:bg-[#4A2370] text-white dark:bg-[#FFDE5A] dark:hover:bg-[#E6C851] dark:text-black">
                 <Link href="/signup">Sign up</Link>
               </Button>
             </>
