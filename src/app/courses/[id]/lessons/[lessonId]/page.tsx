@@ -1,16 +1,18 @@
 import prisma from "@/lib/prisma"
 import { LessonClient } from "./lesson-client"
 
-interface PageProps {
-  params: {
-    id: string
-    lessonId: string
-  }
-}
 
-export default async function LessonPage({ params }: PageProps) {
-  const courseId = parseInt(params.id)
-  const lessonId = parseInt(params.lessonId)
+export default async function LessonPage({ params }: { params: Promise<{
+  id: string
+  lessonId: string
+}>}) {
+  const parsedParams = (await params)
+
+  if(!parsedParams) {
+    return <div>Course not found</div>
+  }
+  const courseId = parseInt(parsedParams.id)
+  const lessonId = parseInt(parsedParams.lessonId)
   const DUMMY_USER_ID = 1 // This should come from auth system
 
   // Fetch lesson data

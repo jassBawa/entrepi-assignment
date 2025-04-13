@@ -74,11 +74,20 @@ async function getLesson(lessonId: number): Promise<Lesson | null> {
 export default async function LessonPage({
   params
 }: {
-  params: { lessonId: string }
+  params: Promise<{ lessonId: string }>
 }) {
-  const lessonId = parseInt(params.lessonId)
-  const lesson = await getLesson(lessonId)
+  const lessonId = (await params).lessonId
 
+  if(!lessonId) {
+    return (
+      <div className="container mx-auto py-8">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Lesson not found</h1>
+        </div>
+      </div>
+    )
+  }
+  const lesson = await getLesson(parseInt(lessonId))
   if (!lesson) {
     return (
       <div className="container mx-auto py-8">

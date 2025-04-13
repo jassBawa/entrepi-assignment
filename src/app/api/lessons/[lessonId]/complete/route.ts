@@ -76,6 +76,7 @@ export async function POST(
         lastActiveOn: today
       }
     })
+    console.log("updatedStreak", updatedStreak)
 
     return NextResponse.json({ completedLesson, streak: updatedStreak })
   } catch (error) {
