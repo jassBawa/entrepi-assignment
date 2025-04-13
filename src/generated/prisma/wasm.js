@@ -130,10 +130,24 @@ exports.Prisma.StreakScalarFieldEnum = {
   lastActiveOn: 'lastActiveOn'
 };
 
+exports.Prisma.CourseScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  description: 'description'
+};
+
 exports.Prisma.LessonScalarFieldEnum = {
   id: 'id',
   title: 'title',
-  content: 'content'
+  content: 'content',
+  courseId: 'courseId'
+};
+
+exports.Prisma.LessonCompletionScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  lessonId: 'lessonId',
+  completedAt: 'completedAt'
 };
 
 exports.Prisma.ReflectiveQuestionScalarFieldEnum = {
@@ -158,7 +172,9 @@ exports.Prisma.SortOrder = {
 exports.Prisma.ModelName = {
   User: 'User',
   Streak: 'Streak',
+  Course: 'Course',
   Lesson: 'Lesson',
+  LessonCompletion: 'LessonCompletion',
   ReflectiveQuestion: 'ReflectiveQuestion',
   Reflection: 'Reflection'
 };

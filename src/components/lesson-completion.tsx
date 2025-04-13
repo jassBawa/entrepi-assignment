@@ -16,13 +16,8 @@ export function LessonCompletion({ lessonId }: LessonCompletionProps) {
     try {
       setLoading(true)
       
-      // Update lesson completion status
+      // Update lesson completion status and streak
       await fetch(`/api/lessons/${lessonId}/complete`, {
-        method: "POST",
-      })
-
-      // Update streak
-      await fetch("/api/streak", {
         method: "POST",
       })
 

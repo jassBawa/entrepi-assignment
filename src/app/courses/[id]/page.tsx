@@ -1,5 +1,3 @@
-'use client';
-
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -13,58 +11,54 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-interface Lesson {
-  id: number;
-  title: string;
-  description: string;
-  duration: string;
-  completed: boolean;
-}
+import prisma from '@/lib/prisma';
 
-const dummyLessons: Lesson[] = [
-  {
-    id: 1,
-    title: 'Introduction to Quantum States',
-    description: 'Learn about quantum states and their properties',
-    duration: '15 min',
-    completed: true,
-  },
-  {
-    id: 2,
-    title: 'Wave-Particle Duality',
-    description: 'Understand the dual nature of quantum particles',
-    duration: '20 min',
-    completed: true,
-  },
-  {
-    id: 3,
-    title: 'Quantum Superposition',
-    description: 'Explore the concept of quantum superposition',
-    duration: '25 min',
-    completed: false,
-  },
-  {
-    id: 4,
-    title: 'Quantum Entanglement',
-    description: 'Learn about quantum entanglement and its applications',
-    duration: '30 min',
-    completed: false,
-  },
-];
-
-export default function CourseDetailPage({
+export default async function CourseDetailPage({
   params,
 }: {
   params: { id: string };
 }) {
   const courseId = parseInt(params.id);
-  const router = useRouter();
-  const progress = 50; // This would come from the database
-  const completedLessons = dummyLessons.filter(
-    (lesson) => lesson.completed
-  ).length;
-  const totalLessons = dummyLessons.length;
+  
+  // Fetch course details
+  const course = await prisma.course.findUnique({
+    where: { id: courseId },
+    include: { lessons: true },
+  });
+  
+  if (!course) {
+    return <div>Course not found</div>;
+  }
+  
+  // Get user (assuming logged in user with ID 1 for now)
+  const userId = 1; // This should come from authentication
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    include: {
+      lessonCompletions: {
+        where: {
+          lesson: {
+            courseId: courseId
+          }
+        }
+      }
+    }
+  });
+  
+  // Map lesson completions for quick lookups
+  const completedLessonIds = new Set(
+    user?.lessonCompletions.map(completion => completion.lessonId) || []
+  );
+  
+  // Calculate progress
+  const totalLessons = course.lessons.length;
+  const completedLessons = user?.lessonCompletions.filter(
+    completion => completion.lessonId === courseId
+  ).length || 0;
+  
+  const progress = totalLessons > 0 
+    ? Math.round((completedLessons / totalLessons) * 100) 
+    : 0;
 
   return (
     <div className="container mx-auto py-8">
@@ -75,7 +69,7 @@ export default function CourseDetailPage({
           </Link>
         </Button>
         <h1 className="text-3xl font-bold">
-          Introduction to Quantum Mechanics
+          {course.title}
         </h1>
       </div>
 
@@ -87,32 +81,33 @@ export default function CourseDetailPage({
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {dummyLessons.map((lesson) => (
-                  <div
-                    key={lesson.id}
-                    className="flex items-start gap-4 p-4 rounded-lg border"
-                  >
-                    <div className="flex-shrink-0">
-                      {lesson.completed ? (
-                        <CheckCircle2 className="h-6 w-6 text-green-500" />
-                      ) : (
-                        <div className="h-6 w-6 rounded-full border-2 border-gray-300" />
-                      )}
-                    </div>
-                    <div className="flex-grow">
-                      <h3 className="font-medium">{lesson.title}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        {lesson.description}
-                      </p>
-                      <div className="mt-2 text-sm text-muted-foreground">
-                        Duration: {lesson.duration}
+                {course.lessons.map((lesson) => {
+                  const isCompleted = completedLessonIds.has(lesson.id);
+                  
+                  return (
+                    <div
+                      key={lesson.id}
+                      className="flex items-start gap-4 p-4 rounded-lg border"
+                    >
+                      <div className="flex-shrink-0">
+                        {isCompleted ? (
+                          <CheckCircle2 className="h-6 w-6 text-green-500" />
+                        ) : (
+                          <div className="h-6 w-6 rounded-full border-2 border-gray-300" />
+                        )}
                       </div>
+                      <div className="flex-grow">
+                        <h3 className="font-medium">{lesson.title}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {lesson.content.substring(0, 100)}...
+                        </p>
+                      </div>
+                      <Link href={`/courses/${courseId}/lessons/${lesson.id}`}>
+                        {isCompleted ? 'Review' : 'Start'}
+                      </Link>
                     </div>
-                    <Button variant="outline" size="sm" onClick={() => router.push(`/courses/${courseId}/lessons/${lesson.id}`)}>
-                      {lesson.completed ? 'Review' : 'Start'}
-                    </Button>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
@@ -143,11 +138,7 @@ export default function CourseDetailPage({
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                This course introduces the fundamental concepts of quantum
-                mechanics, including quantum states, wave-particle duality,
-                superposition, and entanglement. You'll learn how these concepts
-                form the basis of modern physics and their applications in
-                technology.
+                {course.description}
               </p>
             </CardContent>
           </Card>

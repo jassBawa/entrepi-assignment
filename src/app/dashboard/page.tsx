@@ -61,7 +61,7 @@ export default function Dashboard() {
           </div>
         </div>
         <div className="space-y-6">
-          {/* <ReflectiveQuestions /> */}
+          <ReflectiveQuestions />
         </div>
       </div>
     </div>

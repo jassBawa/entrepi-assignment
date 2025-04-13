@@ -2,52 +2,59 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import prisma from "@/lib/prisma"
 
-interface Course {
+interface CourseWithProgress {
   id: number
   title: string
   description: string
-  category: string
-  progress: number
+  lessons: {
+    id: number
+    title: string
+    completed: boolean
+  }[]
   totalLessons: number
   completedLessons: number
-  image: string
+  progress: number
 }
 
-const dummyCourses: Course[] = [
-  {
-    id: 1,
-    title: "Introduction to Quantum Mechanics",
-    description: "Learn the fundamentals of quantum physics and its applications",
-    category: "Physics",
-    progress: 60,
-    totalLessons: 10,
-    completedLessons: 6,
-    image: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb"
-  },
-  {
-    id: 2,
-    title: "Advanced Calculus",
-    description: "Master advanced mathematical concepts and problem-solving techniques",
-    category: "Mathematics",
-    progress: 30,
-    totalLessons: 15,
-    completedLessons: 4,
-    image: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb"
-  },
-  {
-    id: 3,
-    title: "Machine Learning Fundamentals",
-    description: "Understand the basics of machine learning and artificial intelligence",
-    category: "Computer Science",
-    progress: 80,
-    totalLessons: 8,
-    completedLessons: 6,
-    image: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb"
-  }
-]
+async function getCourses(): Promise<CourseWithProgress[]> {
+  const courses = await prisma.course.findMany({
+    include: {
+      lessons: {
+        include: {
+          completions: true
+        }
+      }
+    }
+  })
 
-export default function CoursesPage() {
+  return courses.map(course => {
+    const totalLessons = course.lessons.length
+    const completedLessons = course.lessons.filter(lesson => 
+      lesson.completions.length > 0
+    ).length
+    const progress = totalLessons > 0 ? (completedLessons / totalLessons) * 100 : 0
+
+    return {
+      id: course.id,
+      title: course.title,
+      description: course.description,
+      lessons: course.lessons.map(lesson => ({
+        id: lesson.id,
+        title: lesson.title,
+        completed: lesson.completions.length > 0
+      })),
+      totalLessons,
+      completedLessons,
+      progress
+    }
+  })
+}
+
+export default async function CoursesPage() {
+  const courses = await getCourses()
+
   return (
     <div className="container mx-auto py-8">
       <div className="flex justify-between items-center mb-8">
@@ -57,11 +64,11 @@ export default function CoursesPage() {
         </Button>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {dummyCourses.map((course) => (
+        {courses.map((course) => (
           <Card key={course.id} className="overflow-hidden">
             <div className="h-48 bg-gray-200">
               <img
-                src={course.image}
+                src={`https://source.unsplash.com/random/400x300/?${encodeURIComponent(course.title)}`}
                 alt={course.title}
                 className="w-full h-full object-cover"
               />
@@ -70,7 +77,7 @@ export default function CoursesPage() {
               <div className="flex justify-between items-start">
                 <CardTitle>{course.title}</CardTitle>
                 <span className="text-sm text-muted-foreground bg-muted px-2 py-1 rounded">
-                  {course.category}
+                  {course.title.split(' ')[0]}
                 </span>
               </div>
             </CardHeader>
@@ -81,7 +88,7 @@ export default function CoursesPage() {
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span>Progress</span>
-                  <span>{course.progress}%</span>
+                  <span>{Math.round(course.progress)}%</span>
                 </div>
                 <Progress value={course.progress} className="h-2" />
                 <div className="text-sm text-muted-foreground">

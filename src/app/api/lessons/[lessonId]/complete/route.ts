@@ -1,43 +1,36 @@
 import { NextResponse } from "next/server"
 import prisma from "@/lib/prisma"
 
-const DUMMY_USER_ID = 1
-const XP_REWARD = 10 // XP per active day
-
-// GET: Fetch current streak data
-export async function GET() {
+export async function POST(
+  request: Request,
+  { params }: { params: { lessonId: string } }
+) {
   try {
-    const user = await prisma.user.findUnique({
-      where: { id: DUMMY_USER_ID },
-      include: { streak: true },
-    })
+    const lessonId = parseInt(params.lessonId)
+
+    // Get the first user
+    const user = await prisma.user.findFirst()
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
 
-    return NextResponse.json({
-      currentCount: user.streak?.currentCount || 0,
-      lastActiveOn: user.streak?.lastActiveOn,
+    // Mark the lesson as completed
+    const completedLesson = await prisma.lessonCompletion.create({
+      data: {
+        userId: user.id,
+        lessonId: lessonId,
+        completedAt: new Date()
+      }
     })
-  } catch (error) {
-    console.error("Error fetching streak:", error)
-    return NextResponse.json(
-      { error: "Failed to fetch streak" },
-      { status: 500 }
-    )
-  }
-}
 
-// POST: Update streak on user activity & reward XP
-export async function POST() {
-  try {
-    const user = await prisma.user.findUnique({
-      where: { id: DUMMY_USER_ID },
+    // Get the user's current streak
+    const userWithStreak = await prisma.user.findUnique({
+      where: { id: user.id },
       include: { streak: true }
     })
 
-    if (!user) {
+    if (!userWithStreak) {
       return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
 
@@ -45,28 +38,28 @@ export async function POST() {
     today.setHours(0, 0, 0, 0)
 
     // If user doesn't have a streak record, create one
-    if (!user.streak) {
+    if (!userWithStreak.streak) {
       const streak = await prisma.streak.create({
         data: {
-          userId: DUMMY_USER_ID,
+          userId: user.id,
           currentCount: 1,
           lastActiveOn: today
         }
       })
-      return NextResponse.json(streak)
+      return NextResponse.json({ completedLesson, streak })
     }
 
-    const lastActive = new Date(user.streak.lastActiveOn)
+    const lastActive = new Date(userWithStreak.streak.lastActiveOn)
     lastActive.setHours(0, 0, 0, 0)
 
     // Calculate days difference
     const daysDiff = Math.floor((today.getTime() - lastActive.getTime()) / (1000 * 60 * 60 * 24))
 
-    let newStreakCount = user.streak.currentCount
+    let newStreakCount = userWithStreak.streak.currentCount
 
     if (daysDiff === 0) {
       // Already active today
-      return NextResponse.json(user.streak)
+      return NextResponse.json({ completedLesson, streak: userWithStreak.streak })
     } else if (daysDiff === 1) {
       // Consecutive day
       newStreakCount += 1
@@ -74,23 +67,22 @@ export async function POST() {
       // Streak broken, reset to 1
       newStreakCount = 1
     }
-    console.log("newStreakCount", newStreakCount)
 
     // Update the streak
     const updatedStreak = await prisma.streak.update({
-      where: { id: user.streak.id },
+      where: { id: userWithStreak.streak.id },
       data: {
         currentCount: newStreakCount,
         lastActiveOn: today
       }
     })
 
-    return NextResponse.json(updatedStreak)
+    return NextResponse.json({ completedLesson, streak: updatedStreak })
   } catch (error) {
-    console.error("Error updating streak:", error)
+    console.error("Error completing lesson:", error)
     return NextResponse.json(
-      { error: "Failed to update streak" },
+      { error: "Failed to complete lesson" },
       { status: 500 }
     )
   }
-}
+} 
