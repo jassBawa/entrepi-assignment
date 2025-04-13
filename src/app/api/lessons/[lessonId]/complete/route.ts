@@ -1,12 +1,14 @@
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import prisma from "@/lib/prisma"
 
 export async function POST(
-  request: Request,
-  { params }: { params: { lessonId: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ lessonId: string }> }
 ) {
   try {
-    const lessonId = parseInt(params.lessonId)
+    const { lessonId } = await params
+
+    const parsedLessonId = parseInt(lessonId)
 
     // Get the first user
     const user = await prisma.user.findFirst()
@@ -19,7 +21,7 @@ export async function POST(
     const completedLesson = await prisma.lessonCompletion.create({
       data: {
         userId: user.id,
-        lessonId: lessonId,
+        lessonId: parsedLessonId,
         completedAt: new Date()
       }
     })

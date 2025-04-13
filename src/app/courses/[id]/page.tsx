@@ -13,8 +13,18 @@ import {
 import Link from 'next/link';
 import prisma from '@/lib/prisma';
 
-export default async function CoursePage({ params }: { params: { id: string } }) {
-  const courseId = parseInt(params.id);
+// In App Router with server components, params is a prop passed to the page component
+export default async function CoursePage({ params }: { params: Promise<{ id: string }> }) {
+  // Since we're using the App Router in a server component, we need to make sure params is available
+  // before using it (it might be coming from an async source)
+  const parsedParams = (await params)
+  const courseId = parseInt(parsedParams.id);
+  if (!courseId) {
+    return <div>Invalid course ID</div>;
+  }
+
+
+  
   
   // Fetch course details
   const course = await prisma.course.findUnique({
@@ -48,9 +58,7 @@ export default async function CoursePage({ params }: { params: { id: string } })
   
   // Calculate progress
   const totalLessons = course.lessons.length;
-  const completedLessons = user?.lessonCompletions.filter(
-    completion => completion.lessonId === courseId
-  ).length || 0;
+  const completedLessons = completedLessonIds.size;
   
   const progress = totalLessons > 0 
     ? Math.round((completedLessons / totalLessons) * 100) 
@@ -82,7 +90,7 @@ export default async function CoursePage({ params }: { params: { id: string } })
             <div className="space-y-2">
               <div className="flex justify-between text-sm text-black dark:text-white">
                 <span>Progress</span>
-                <span>{Math.round(progress)}%</span>
+                <span>{progress}%</span>
               </div>
               <Progress 
                 value={progress} 

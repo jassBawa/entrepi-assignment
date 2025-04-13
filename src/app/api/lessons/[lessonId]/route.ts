@@ -3,13 +3,14 @@ import prisma from "@/lib/prisma"
 
 export async function GET(
   request: Request,
-  { params }: { params: { lessonId: string } }
+  { params }: { params: Promise<{ lessonId: string }> }
 ) {
   try {
-    const lessonId = parseInt(params.lessonId)
+    const { lessonId } = await params
+    const parsedLessonId = parseInt(lessonId)
 
     const lesson = await prisma.lesson.findUnique({
-      where: { id: lessonId },
+      where: { id: parsedLessonId },
       include: {
         reflections: {
           select: {
